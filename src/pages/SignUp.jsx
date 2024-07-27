@@ -1,9 +1,15 @@
 import React, { useState } from 'react'
 import signImg from '../assets/signup.jpg'
-// import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { RotatingLines } from 'react-loader-spinner'
 
 const SignUp = () => {
+
+  const auth = getAuth();
+  const navigate = useNavigate();
+
   let [email, setEmail] = useState("");
   let [name, setName] = useState("");
   let [password, setPassword] = useState("");
@@ -38,6 +44,23 @@ const SignUp = () => {
     if (!password) {
       setPassworderr("Password is required");
     }
+    if(email && name && password){
+      setLoader(true)
+      createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed up 
+        const user = userCredential.user;
+        console.log(user);
+        setLoader(false);
+        navigate('/');
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(error);
+        setLoader(false)
+      });
+    }
   }
 
   return (
@@ -68,8 +91,8 @@ const SignUp = () => {
             <label className='text-sm font-semibold text-secondary absolute top-[-10px] left-[50px] bg-white px-2'>Password</label>
             <input onChange={handlePassword}
             value={password}
-            type="password" className='w-full h-full border border-secondary/50 rounded-lg pl-[50px]' placeholder='Enter Your Password' />
-            {/* {passwordshow ? (
+            type={passwordshow ? 'text':'password'} className='w-full h-full border border-secondary/50 rounded-lg pl-[50px]' placeholder='Enter Your Password' />
+            {passwordshow ? (
               <FaEye
                 onClick={() => setPasswordshow(false)}
                 className=" text-2xl absolute top-2/4 translate-y-[-50%] right-5 cursor-pointer"
@@ -79,13 +102,13 @@ const SignUp = () => {
                 onClick={() => setPasswordshow(true)}
                 className=" text-2xl absolute top-2/4 translate-y-[-50%] right-5 cursor-pointer"
               />
-            )} */}
+            )}
             {passworderr && (
               <p className=" text-red-500 text-xl font-normal text-left">{passworderr}</p>
             )}
           </div>
-          <button onClick={handleSubmit} className='bg-primary w-[368px] py-5 text-xl font-semibold text-white rounded-[89px] mt-[51px]'>Sign Up</button>
-          <p className='text-sm text-secondary text-center w-[368px] mt-[36px]'>Already  have an account ? <Link className='text-[#EA6C00] font-semibold'>Sign In</Link></p>
+          <button onClick={handleSubmit} className='bg-primary w-[368px] py-5 text-xl font-semibold text-white rounded-[89px] mt-[51px] text-center'>{ loader? <span className=' text-center inline-block'><RotatingLines height="30" width='30' /></span>: 'Sign Up'}</button>
+          <p className='text-sm text-secondary text-center w-[368px] mt-[36px]'>Already  have an account ? <Link to="/" className='text-[#EA6C00] font-semibold'>Sign In</Link></p>
         </div>
       </div>
       <div className="h-full w-2/4">
