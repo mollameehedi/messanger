@@ -2,12 +2,13 @@ import React, { useState } from 'react'
 import signInImg from '../assets/signin.jpg'
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword,GoogleAuthProvider,signInWithPopup  } from "firebase/auth";
 import { toast } from 'react-toastify';
 
 const SignIn = () => {
 
   const auth = getAuth();
+  const provider = new GoogleAuthProvider();
 
   let [emailerr, setEmailerr] = useState("");
   let [passworderr, setPassworderr] = useState("");
@@ -52,6 +53,28 @@ let handleSubmit = () => {
   }
 }
 
+let loginWithGoogle = () => {
+
+  signInWithPopup(auth, provider)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken;
+    // The signed-in user info.
+    const user = result.user;
+    toast.success("Login Susseccfully!!")
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    console.log(error);
+  });
+
+}
   return (
     <div className='w-full h-screen flex'>
       <div className="h-full w-2/4 flex items-center justify-center">
@@ -90,9 +113,9 @@ let handleSubmit = () => {
             )}
           </div>
           
-          <div className="flex ">
+          <div className="flex flex-col">
           <button onClick={handleSubmit} className='bg-primary w-[368px] py-5 text-xl font-semibold text-white rounded-[89px] mt-[51px]'>Login to Continue</button>
-          <button onClick={handleSubmit} className='bg-primary w-[368px] py-5 text-xl font-semibold text-white rounded-[89px] mt-[51px]'><FaGoogle/> <span className="pl-2">Login With Google</span></button>
+          <button onClick={loginWithGoogle} className='bg-primary w-[368px] py-5 text-xl font-semibold text-white rounded-[89px] mt-[51px] flex items-center justify-center'><FaGoogle/> <span className="pl-2">Login With Google</span></button>
           </div>
           <p className='text-sm text-secondary text-center w-[368px] mt-[36px]'>Don’t have an account ?<Link to="/signup" className='text-[#EA6C00] font-semibold'>Sign Up</Link></p>
         </div>
