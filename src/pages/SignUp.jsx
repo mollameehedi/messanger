@@ -50,14 +50,12 @@ const SignUp = () => {
       .then((userCredential) => {
         // Signed up 
         const user = userCredential.user;
-        console.log(user);
+        
         setLoader(false);
         navigate('/');
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(error);
+        error.code.includes('auth/email-already-in-use') &&  setEmailerr('Your email already use')
         setLoader(false)
       });
     }
